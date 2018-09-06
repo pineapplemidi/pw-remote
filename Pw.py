@@ -1,11 +1,12 @@
 from __future__ import absolute_import, print_function, unicode_literals
+
 import Live
 import io
 import json
-# import sys
+import sys
 
-# sys.path.append('/Library/Frameworks/Python.framework/Versions/2.7/
-# lib/python2.7/site-packages/')
+sys.path.append('/Library/Frameworks/Python.framework/Versions/2.7/ \
+lib/python2.7/site-packages/')
 
 # from OSC import OSCClient, OSCMessage
 
@@ -19,7 +20,7 @@ class Pw(ControlSurface):
     def __init__(self, c_instance):
         super(Pw, self).__init__(c_instance)
         with self.component_guard():
-            self.log('Setup Config')
+            self.clips = []
             config = self._open_config()
             self._setup_session(config['width'], config['height'])
             self._setup_strip()
@@ -33,17 +34,17 @@ class Pw(ControlSurface):
 
     def _track_clip_slots_info(self):
         track = self.session.tracks_to_use()[0]
-        # self.log(json.dumps(dir(track.clip_slots[0].clip.name)))
-        self.log(track.clip_slots[0].clip.name)
+        for cs in track.clip_slots:
+            if cs.clip is not None:
+                self.clips.append(cs.clip.name)
+        self.log(json.dumps(self.clips))
 
     def _setup_session(self, width, height):
-        self.log('Setup Session')
         self.session = SessionComponent(width, height)
         self.session.set_offsets(0, 0)
         self.set_highlighting_session_component(self.session)
 
     def _setup_strip(self):
-        self.log('Setup Strip')
         self.strip = ChannelStripComponent()
         self._update_strip()
 
